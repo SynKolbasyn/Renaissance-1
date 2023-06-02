@@ -13,6 +13,7 @@ class Player:
     def info(self) -> str:
         return f"Name: {self.name}\n" \
                f"ID: {self.identification_number}\n" \
+               f"Location: {self.location}\n" \
                f"Damage: {self.damage}\n" \
                f"Health points: {self.health_points}\n" \
                f"Mana: {self.mana}\n" \

@@ -10,6 +10,15 @@ bot = aiogram.Bot(token=os.getenv("BOT_TOKEN"))
 dp = aiogram.Dispatcher(bot)
 
 
+async def setup_bot_commands(dispatcher):
+    bot_commands = [
+        aiogram.types.BotCommand(command="/start", description="Show start menu"),
+        aiogram.types.BotCommand(command="/help", description="Show start menu"),
+        aiogram.types.BotCommand(command="/info", description="Show player info")
+    ]
+    await bot.set_my_commands(bot_commands)
+
+
 @dp.message_handler(commands=["start", "help"])
 async def start(message: aiogram.types.Message):
     if not functions.is_account_exist(message.from_user.id):
@@ -28,9 +37,12 @@ async def info(message: aiogram.types.Message):
 
 
 @dp.message_handler()
-async def main(message: aiogram.types.Message):
-    pass
+async def events(message: aiogram.types.Message):
+    answer = functions.do_event(message.from_user.id, message.text)
+    keyboard = aiogram.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add(*functions.get_players_events(message.from_user.id))
+    await message.answer(answer, reply_markup=keyboard)
 
 
 if __name__ == "__main__":
-    aiogram.executor.start_polling(dp, skip_updates=True)
+    aiogram.executor.start_polling(dp, skip_updates=True, on_startup=setup_bot_commands)

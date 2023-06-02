@@ -3,10 +3,13 @@ import ujson
 import player
 
 
+def get_dict_from_json(file_name: str) -> dict:
+    with open(file_name, "r") as file:
+        return ujson.load(file)
+
+
 def get_account_dict(identification_number: int) -> dict:
-    with open("players_data_base.json", "r") as file:
-        player_data_base = ujson.load(file)
-    return player_data_base[f"{identification_number}"]
+    return get_dict_from_json("players_data_base.json")[f"{identification_number}"]
 
 
 def create_exist_player(identification_number: int) -> player.Player:
@@ -16,14 +19,11 @@ def create_exist_player(identification_number: int) -> player.Player:
 
 
 def is_account_exist(identification_number: int) -> bool:
-    with open("players_data_base.json", "r") as file:
-        player_data_base = ujson.load(file)
-    return f"{identification_number}" in player_data_base.keys()
+    return f"{identification_number}" in get_dict_from_json("players_data_base.json").keys()
 
 
 def create_new_account(name: str, login: str, identification_number: int):
-    with open("players_data_base.json", "r") as file:
-        player_data_base = ujson.load(file)
+    player_data_base = get_dict_from_json("players_data_base.json")
     player_data_base[f"{identification_number}"] = player.Player(name, login, identification_number, "Forest", 1, 100,
                                                                  100, 0).json()
     with open("players_data_base.json", "w") as file:
@@ -31,9 +31,7 @@ def create_new_account(name: str, login: str, identification_number: int):
 
 
 def get_players_events(identification_number: int) -> list:
-    with open("locations.json", "r") as file:
-        locations = ujson.load(file)
-    return locations[get_account_dict(identification_number)["location"]]["events"]
+    return get_dict_from_json("locations.json")[get_account_dict(identification_number)["location"]]["events"]
 
 
 def get_player_info(identification_number: int) -> str:

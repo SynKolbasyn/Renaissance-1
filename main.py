@@ -27,5 +27,10 @@ async def info(message: aiogram.types.Message):
     await message.answer(functions.get_player_info(message.from_user.id))
 
 
+@dp.message_handler()
+async def main(message: aiogram.types.Message):
+    pass
+
+
 if __name__ == "__main__":
     aiogram.executor.start_polling(dp, skip_updates=True)

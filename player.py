@@ -7,12 +7,15 @@ class Player:
         self.damage = 1
         self.health_points = 100
         self.mana = 100
+        self.money = 0
 
     def info(self) -> str:
         return f"Name: {self.name}\n" \
+               f"ID: {self.identification_number}\n" \
                f"Damage: {self.damage}\n" \
                f"Health points: {self.health_points}\n" \
-               f"Mana: {self.mana}"
+               f"Mana: {self.mana}\n" \
+               f"Money: {self.money}"
 
     def json(self) -> dict:
         return {"name": self.name,
@@ -21,4 +24,5 @@ class Player:
                 "location": self.location,
                 "damage": self.damage,
                 "health_points": self.health_points,
-                "mana": self.mana}
+                "mana": self.mana,
+                "money": self.money}

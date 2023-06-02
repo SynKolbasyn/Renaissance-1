@@ -1,1 +1,4 @@
 .idea/
+players_data_base.json
+locations.json
+__pycache__/

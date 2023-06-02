@@ -2,6 +2,8 @@ import logging
 import aiogram
 import os
 
+import functions
+
 logging.basicConfig(level=logging.INFO)
 
 bot = aiogram.Bot(token=os.getenv("BOT_TOKEN"))
@@ -10,13 +12,11 @@ dp = aiogram.Dispatcher(bot)
 
 @dp.message_handler(commands=["start", "help"])
 async def start(message: aiogram.types.Message):
-    await message.answer("Welcome to Renaissance, here you can do whatever you want, "
-                         "and your path is determined only by you. What are you waiting for, let's go!")
-
-
-@dp.message_handler()
-async def main(message: aiogram.types.Message):
-    pass
+    if not functions.is_account_exist(message.from_user.id):
+        functions.create_new_account(message.from_user.first_name, message.from_user.username, message.from_user.id)
+    await message.answer(f"Hello {message.from_user.first_name}. "
+                         f"Welcome to Renaissance, here you can do whatever you want, "
+                         f"and your path is determined only by you. What are you waiting for, let's go!")
 
 
 if __name__ == "__main__":

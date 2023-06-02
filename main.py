@@ -22,5 +22,10 @@ async def start(message: aiogram.types.Message):
                          reply_markup=keyboard)
 
 
+@dp.message_handler(commands="info")
+async def info(message: aiogram.types.Message):
+    await message.answer(functions.get_player_info(message.from_user.id))
+
+
 if __name__ == "__main__":
     aiogram.executor.start_polling(dp, skip_updates=True)

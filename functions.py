@@ -45,11 +45,16 @@ def get_player_info(identification_number: int) -> str:
     return create_exist_player(identification_number).info()
 
 
+def check_event_type(account: player.Player, events: dict, event: str) -> player.Player:
+    if events[event]["type"] == "movement":
+        account.location = events[event]["location"]
+    return account
+
+
 def do_event(identification_number: int, event: str) -> str:
     events = get_dict_from_json("events.json")
-    if not (event in events):
+    if not (event in events.keys()):
         return "Unknown action"
     account = create_exist_player(identification_number)
-    account.location = events[event]["location"]
-    update_player_data_base(account)
+    update_player_data_base(check_event_type(account, events, event))
     return events[event]["description"]

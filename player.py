@@ -1,6 +1,6 @@
 class Player:
     def __init__(self, name: str, login: str, identification_number: int, location: str, damage: int,
-                 health_points: int, mana: int, money: int):
+                 health_points: int, mana: int, money: int, experience, enemies: dict):
         self.name = name
         self.login = login
         self.identification_number = identification_number
@@ -9,6 +9,8 @@ class Player:
         self.health_points = health_points
         self.mana = mana
         self.money = money
+        self.experience = experience
+        self.enemies = enemies
 
     def info(self) -> str:
         return f"Name: {self.name}\n" \
@@ -20,11 +22,15 @@ class Player:
                f"Money: {self.money}"
 
     def json(self) -> dict:
-        return {"name": self.name,
-                "login": self.login,
-                "identification_number": self.identification_number,
-                "location": self.location,
-                "damage": self.damage,
-                "health_points": self.health_points,
-                "mana": self.mana,
-                "money": self.money}
+        return {
+            "name": self.name,
+            "login": self.login,
+            "identification_number": self.identification_number,
+            "location": self.location,
+            "damage": self.damage,
+            "health_points": self.health_points,
+            "mana": self.mana,
+            "money": self.money,
+            "experience": self.experience,
+            "enemies": self.enemies
+        }

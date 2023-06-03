@@ -3,3 +3,4 @@ __pycache__/
 players_data_base.json
 locations.json
 events.json
+npc_stats.json

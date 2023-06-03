@@ -49,9 +49,8 @@ class Player:
         return self.health_points <= 0
 
     def update_player_data_base(self):
-        player_data_base = get_dict_from_json("players_data_base.json")
-        player_data_base[f"{self.identification_number}"] = self.json()
-        with open("players_data_base.json", "w") as file:
+        player_data_base = self.json()
+        with open(f"players_data_base/{self.identification_number}.json", "w") as file:
             file.write(ujson.dumps(player_data_base, indent=2))
 
     def change_location(self, location: str):
@@ -81,10 +80,12 @@ class Player:
             answer += f"You got {enemies[i].damage} damage from {i}. " \
                       f"You have {self.health_points} health points\n"
         if self.is_dead():
-            data = get_dict_from_json("players_data_base.json")
-            del data[f"{self.identification_number}"]
-            with open("players_data_base.json", "w") as file:
-                file.write(ujson.dumps(data, indent=2))
+            with open(f"players_data_base/{self.identification_number}.json", "w") as file:
+                file.write(ujson.dumps({"name": self.name, "login": self.login,
+                                        "identification_number": self.identification_number,
+                                        "location": "Forest", "damage": 1, "health_points": 100, "mana": 100,
+                                        "money": 0, "experience": 0, "enemies": {}
+                                        }, indent=2))
             return "You dead"
         for i in enemies:
             self.enemies[i] = enemies[i].json()

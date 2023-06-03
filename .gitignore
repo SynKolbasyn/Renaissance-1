@@ -1,6 +1,6 @@
 .idea/
 __pycache__/
-players_data_base.json
+players_data_base/
 locations.json
 events.json
 npc_stats.json

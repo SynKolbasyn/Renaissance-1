@@ -1,4 +1,5 @@
 import ujson
+import os
 
 import player
 
@@ -9,18 +10,16 @@ def get_dict_from_json(file_name: str) -> dict:
 
 
 def get_account_dict(identification_number: int) -> dict:
-    return get_dict_from_json("players_data_base.json")[f"{identification_number}"]
+    return get_dict_from_json(f"players_data_base/{identification_number}.json")
 
 
 def is_account_exist(identification_number: int) -> bool:
-    return f"{identification_number}" in get_dict_from_json("players_data_base.json").keys()
+    return f"{identification_number}.json" in os.listdir("players_data_base/")
 
 
 def create_new_account(name: str, login: str, identification_number: int):
-    player_data_base = get_dict_from_json("players_data_base.json")
-    player_data_base[f"{identification_number}"] = player.Player(name, login, identification_number, "Forest", 1, 100,
-                                                                 100, 0, 0, {}).json()
-    with open("players_data_base.json", "w") as file:
+    player_data_base = player.Player(name, login, identification_number, "Forest", 1, 100, 100, 0, 0, {}).json()
+    with open(f"players_data_base/{identification_number}.json", "w") as file:
         file.write(ujson.dumps(player_data_base, indent=2))
 
 

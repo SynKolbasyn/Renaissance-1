@@ -64,24 +64,29 @@ class Player:
             tmp_enemy = npc.Enemy(enemy_name, self.identification_number, enemy_stats["damage"],
                                   enemy_stats["health_points"], enemy_stats["experience"])
             self.enemies[enemy_name] = tmp_enemy.json()
-        enemy = npc.Enemy(enemy_name, self.identification_number, self.enemies[enemy_name]["damage"],
-                          self.enemies[enemy_name]["health_points"], self.enemies[enemy_name]["experience"])
-        enemy.health_points -= self.damage
-        if enemy.is_enemy_dead():
-            self.experience += enemy.experience
+        enemies = {}
+        for i in self.enemies:
+            enemies[i] = npc.Enemy(i, self.identification_number, self.enemies[i]["damage"],
+                                   self.enemies[i]["health_points"], self.enemies[i]["experience"])
+        enemies[enemy_name].health_points -= self.damage
+        if enemies[enemy_name].is_enemy_dead():
+            self.experience += enemies[enemy_name].experience
             del self.enemies[enemy_name]
             self.update_player_data_base()
             return f"You kill {enemy_name}"
-        self.health_points -= enemy.damage
+        answer = f"{enemy_name} got {self.damage} damage from you. " \
+                 f"{enemy_name} has {enemies[enemy_name].health_points} health points.\n"
+        for i in enemies:
+            self.health_points -= enemies[i].damage
+            answer += f"You got {enemies[i].damage} damage from {i}. " \
+                      f"You have {self.health_points} health points\n"
         if self.is_dead():
             data = get_dict_from_json("players_data_base.json")
             del data[f"{self.identification_number}"]
             with open("players_data_base.json", "w") as file:
                 file.write(ujson.dumps(data, indent=2))
             return "You dead"
-        self.enemies[enemy_name] = enemy.json()
+        for i in enemies:
+            self.enemies[i] = enemies[i].json()
         self.update_player_data_base()
-        return f"{enemy_name} got {self.damage} damage from you. " \
-               f"{enemy_name} has {enemy.health_points} health points.\n" \
-               f"You got {enemy.damage} damage from {enemy_name}. " \
-               f"You have {self.health_points} health points"
+        return answer

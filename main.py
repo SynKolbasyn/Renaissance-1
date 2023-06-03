@@ -33,12 +33,17 @@ async def start(message: aiogram.types.Message):
 
 @dp.message_handler(commands="info")
 async def info(message: aiogram.types.Message):
+    functions.except_not_exist_account(message.from_user.id, message.from_user.first_name, message.from_user.username)
     await message.answer(functions.get_player_info(message.from_user.id))
 
 
 @dp.message_handler()
 async def events(message: aiogram.types.Message):
+    functions.except_not_exist_account(message.from_user.id, message.from_user.first_name, message.from_user.username)
     answer = functions.do_event(message.from_user.id, message.text)
+    if answer.endswith("dead"):
+        await message.answer(answer)
+        return 0
     keyboard = aiogram.types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(*functions.get_players_events(message.from_user.id))
     await message.answer(answer, reply_markup=keyboard)

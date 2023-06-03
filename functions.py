@@ -12,13 +12,6 @@ def get_account_dict(identification_number: int) -> dict:
     return get_dict_from_json("players_data_base.json")[f"{identification_number}"]
 
 
-def create_exist_player(identification_number: int) -> player.Player:
-    account = get_account_dict(identification_number)
-    return player.Player(account["name"], account["login"], account["identification_number"], account["location"],
-                         account["damage"], account["health_points"], account["mana"], account["money"],
-                         account["experience"], account["enemies"])
-
-
 def is_account_exist(identification_number: int) -> bool:
     return f"{identification_number}" in get_dict_from_json("players_data_base.json").keys()
 
@@ -29,6 +22,18 @@ def create_new_account(name: str, login: str, identification_number: int):
                                                                  100, 0, 0, {}).json()
     with open("players_data_base.json", "w") as file:
         file.write(ujson.dumps(player_data_base, indent=2))
+
+
+def create_exist_player(identification_number: int) -> player.Player:
+    account = get_account_dict(identification_number)
+    return player.Player(account["name"], account["login"], account["identification_number"], account["location"],
+                         account["damage"], account["health_points"], account["mana"], account["money"],
+                         account["experience"], account["enemies"])
+
+
+def except_not_exist_account(identification_number: int, name: str, login: str):
+    if not is_account_exist(identification_number):
+        create_new_account(name, login, identification_number)
 
 
 def get_players_events(identification_number: int) -> list:
@@ -46,7 +51,6 @@ def check_event(identification_number: int, events: dict, event: str) -> str:
     answer = ""
     if events[event]["type"] == "battle":
         answer = account.beat_the_enemy(events[event]["enemy"])
-    account.update_player_data_base()
     return answer
 
 

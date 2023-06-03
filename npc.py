@@ -19,3 +19,6 @@ class Enemy:
             "health_points": self.health_points,
             "experience": self.experience
         }
+
+    def is_enemy_dead(self) -> bool:
+        return self.health_points <= 0

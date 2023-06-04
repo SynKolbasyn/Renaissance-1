@@ -36,9 +36,8 @@ class Player:
         if not self.inventory:
             return "You haven't got anything"
         info = ""
-        for i, e in enumerate(self.inventory):
-            info += f"{i + 1}. Name: {e['name']}; Price: {e['price']}; " \
-                    f"HP regeneration: {e['hp_regeneration']}\n"
+        for index, element in enumerate(self.inventory):
+            info += f"{index + 1}. Name: {element['name']}; Price: {element['price']}\n"
         return info[:-1]
 
     def json(self) -> dict:
@@ -68,38 +67,63 @@ class Player:
         self.location = location
         self.update_player_data_base()
 
-    def beat_the_enemy(self, enemy_name: str) -> str:
-        if not (enemy_name in self.enemies.keys()):
-            enemy_stats = get_dict_from_json("npc_stats.json")[enemy_name]
-            tmp_enemy = npc.Enemy(enemy_name, self.identification_number, enemy_stats["damage"],
-                                  enemy_stats["health_points"], enemy_stats["experience"])
-            self.enemies[enemy_name] = tmp_enemy.json()
+    def create_new_enemy(self, enemy_name: str):
+        enemy_stats = get_dict_from_json("npc_stats.json")[enemy_name]
+        tmp_enemy = npc.Enemy(enemy_name, self.identification_number, enemy_stats["damage"],
+                              enemy_stats["health_points"], enemy_stats["experience"])
+        self.enemies[enemy_name] = tmp_enemy.json()
+
+    def create_enemies_dict(self) -> dict:
         enemies = {}
         for i in self.enemies:
             enemies[i] = npc.Enemy(i, self.identification_number, self.enemies[i]["damage"],
                                    self.enemies[i]["health_points"], self.enemies[i]["experience"])
-        enemies[enemy_name].health_points -= self.damage
-        if enemies[enemy_name].is_enemy_dead():
-            self.experience += enemies[enemy_name].experience
-            del self.enemies[enemy_name]
-            self.inventory.append(enemies[enemy_name].get_enemy_drop())
-            self.update_player_data_base()
-            return f"You kill {enemy_name}"
-        answer = f"{enemy_name} got {self.damage} damage from you. " \
-                 f"{enemy_name} has {enemies[enemy_name].health_points} health points.\n"
+        return enemies
+
+    def get_enemy_reward(self, enemies: dict, enemy_name: str) -> str:
+        self.experience += enemies[enemy_name].experience
+        del self.enemies[enemy_name]
+        drop = enemies[enemy_name].get_enemy_drop()
+        self.inventory.append(drop)
+        self.update_player_data_base()
+        return f"You kill {enemy_name}\nYou got {drop['name']} (price: {drop['price']})"
+
+    def get_enemy_damage(self, enemies: dict) -> str:
+        answer = ""
         for i in enemies:
             self.health_points -= enemies[i].damage
             answer += f"You got {enemies[i].damage} damage from {i}. " \
                       f"You have {self.health_points} health points\n"
-        if self.is_dead():
-            with open(f"players_data_base/{self.identification_number}.json", "w") as file:
-                file.write(ujson.dumps({"name": self.name, "login": self.login,
-                                        "identification_number": self.identification_number,
-                                        "location": "Forest", "damage": 1, "health_points": 100, "mana": 100,
-                                        "money": 0, "experience": 0, "enemies": {}, "inventory": []
-                                        }, indent=2))
-            return "You dead"
+        return answer
+
+    def death(self) -> str:
+        self.location = "Forest"
+        self.damage = 1
+        self.health_points = 100
+        self.mana = 100
+        self.money = 0
+        self.experience = 0
+        self.enemies = {}
+        self.inventory = []
+        self.update_player_data_base()
+        return "You dead"
+
+    def save_enemies_data(self, enemies):
         for i in enemies:
             self.enemies[i] = enemies[i].json()
         self.update_player_data_base()
+
+    def beat_the_enemy(self, enemy_name: str) -> str:
+        if not (enemy_name in self.enemies.keys()):
+            self.create_new_enemy(enemy_name)
+        enemies = self.create_enemies_dict()
+        enemies[enemy_name].health_points -= self.damage
+        if enemies[enemy_name].is_enemy_dead():
+            return self.get_enemy_reward(enemies, enemy_name)
+        answer = f"{enemy_name} got {self.damage} damage from you. " \
+                 f"{enemy_name} has {enemies[enemy_name].health_points} health points.\n"
+        answer += self.get_enemy_damage(enemies)
+        if self.is_dead():
+            return self.death()
+        self.save_enemies_data(enemies)
         return answer

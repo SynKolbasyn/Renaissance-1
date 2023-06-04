@@ -52,7 +52,8 @@ async def events(message: aiogram.types.Message):
         await message.answer(answer)
         return 0
     keyboard = aiogram.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(*functions.get_players_events(message.from_user.id))
+    buttons_list = functions.get_players_events(message.from_user.id)
+    keyboard.add(*buttons_list)
     await message.answer(answer, reply_markup=keyboard)
 
 

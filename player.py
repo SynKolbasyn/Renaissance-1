@@ -127,3 +127,19 @@ class Player:
             return self.death()
         self.save_enemies_data(enemies)
         return answer
+
+    def get_item_buttons(self) -> list:
+        items_data = get_dict_from_json("items.json")
+        arr = []
+        for i in self.inventory:
+            arr.append(items_data[i["name"]]["button"])
+        return arr
+
+    def sell_item(self, item: str) -> str:
+        for i, e in enumerate(self.inventory):
+            if e["name"] == item:
+                self.money += e["price"]
+                self.inventory.pop(i)
+                self.update_player_data_base()
+                return f"You sold {item}"
+        return f"You haven't got {item}"

@@ -37,7 +37,13 @@ def except_not_exist_account(identification_number: int, name: str, login: str):
 
 
 def get_players_events(identification_number: int) -> list:
-    return get_dict_from_json("locations.json")[get_account_dict(identification_number)["location"]]["events"]
+    buttons_list = get_dict_from_json("locations.json")[get_account_dict(identification_number)["location"]]["events"]
+    if buttons_list[0] == "items_buttons":
+        account = create_exist_player(identification_number)
+        buttons_list = buttons_list[1:]
+        for i in account.get_item_buttons():
+            buttons_list.append(i)
+    return buttons_list
 
 
 def get_player_info(identification_number: int) -> str:
@@ -51,6 +57,8 @@ def check_event(identification_number: int, events: dict, event: str) -> str:
     answer = ""
     if events[event]["type"] == "battle":
         answer = account.beat_the_enemy(events[event]["enemy"])
+    if events[event]["type"] == "sell":
+        answer = account.sell_item(events[event]["item"])
     return answer
 
 

@@ -14,7 +14,8 @@ async def setup_bot_commands(dispatcher):
     bot_commands = [
         aiogram.types.BotCommand(command="/start", description="Show start menu"),
         aiogram.types.BotCommand(command="/help", description="Show start menu"),
-        aiogram.types.BotCommand(command="/info", description="Show player info")
+        aiogram.types.BotCommand(command="/info", description="Show player info"),
+        aiogram.types.BotCommand(command="/inventory", description="Show player inventory info")
     ]
     await bot.set_my_commands(bot_commands)
 
@@ -35,6 +36,12 @@ async def start(message: aiogram.types.Message):
 async def info(message: aiogram.types.Message):
     functions.except_not_exist_account(message.from_user.id, message.from_user.first_name, message.from_user.username)
     await message.answer(functions.get_player_info(message.from_user.id))
+
+
+@dp.message_handler(commands="inventory")
+async def inventory(message: aiogram.types.Message):
+    functions.except_not_exist_account(message.from_user.id, message.from_user.first_name, message.from_user.username)
+    await message.answer(functions.get_inventory_info(message.from_user.id))
 
 
 @dp.message_handler()

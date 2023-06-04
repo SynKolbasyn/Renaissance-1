@@ -1,3 +1,12 @@
+import random
+import ujson
+
+
+def get_dict_from_json(file_name: str) -> dict:
+    with open(file_name, "r") as file:
+        return ujson.load(file)
+
+
 class NPC:
     def __init__(self, name):
         self.name = name
@@ -22,3 +31,6 @@ class Enemy:
 
     def is_enemy_dead(self) -> bool:
         return self.health_points <= 0
+
+    def get_enemy_drop(self) -> dict:
+        return get_dict_from_json("items.json")[random.choice(get_dict_from_json("npc_stats.json")[self.name]["drop"])]

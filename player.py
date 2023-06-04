@@ -9,7 +9,7 @@ def get_dict_from_json(file_name: str) -> dict:
 
 class Player:
     def __init__(self, name: str, login: str, identification_number: int, location: str, damage: int,
-                 health_points: int, mana: int, money: int, experience: int, enemies: dict):
+                 health_points: int, mana: int, money: int, experience: int, enemies: dict, inventory: list):
         self.name = name
         self.login = login
         self.identification_number = identification_number
@@ -20,6 +20,7 @@ class Player:
         self.money = money
         self.experience = experience
         self.enemies = enemies
+        self.inventory = inventory
 
     def info(self) -> str:
         return f"Name: {self.name}\n" \
@@ -30,6 +31,15 @@ class Player:
                f"Mana: {self.mana}\n" \
                f"Money: {self.money}\n" \
                f"Experience: {self.experience}"
+
+    def inventory_info(self) -> str:
+        if not self.inventory:
+            return "You haven't got anything"
+        info = ""
+        for i, e in enumerate(self.inventory):
+            info += f"{i + 1}. Name: {e['name']}; Price: {e['price']}; " \
+                    f"HP regeneration: {e['hp_regeneration']}\n"
+        return info[:-1]
 
     def json(self) -> dict:
         return {
@@ -42,7 +52,8 @@ class Player:
             "mana": self.mana,
             "money": self.money,
             "experience": self.experience,
-            "enemies": self.enemies
+            "enemies": self.enemies,
+            "inventory": self.inventory
         }
 
     def is_dead(self) -> bool:
@@ -71,6 +82,7 @@ class Player:
         if enemies[enemy_name].is_enemy_dead():
             self.experience += enemies[enemy_name].experience
             del self.enemies[enemy_name]
+            self.inventory.append(enemies[enemy_name].get_enemy_drop())
             self.update_player_data_base()
             return f"You kill {enemy_name}"
         answer = f"{enemy_name} got {self.damage} damage from you. " \
@@ -84,7 +96,7 @@ class Player:
                 file.write(ujson.dumps({"name": self.name, "login": self.login,
                                         "identification_number": self.identification_number,
                                         "location": "Forest", "damage": 1, "health_points": 100, "mana": 100,
-                                        "money": 0, "experience": 0, "enemies": {}
+                                        "money": 0, "experience": 0, "enemies": {}, "inventory": []
                                         }, indent=2))
             return "You dead"
         for i in enemies:

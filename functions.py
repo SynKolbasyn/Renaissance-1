@@ -18,7 +18,8 @@ def is_account_exist(identification_number: int) -> bool:
 
 
 def create_new_account(name: str, login: str, identification_number: int):
-    player_data_base = player.Player(name, login, identification_number, "Forest", 1, 100, 100, 0, 0, {}).json()
+    player_data_base = player.Player(name, login, identification_number, "Forest", 1, 100, 100, 0, 0, {}, []).json()
+    print(player_data_base)
     with open(f"players_data_base/{identification_number}.json", "w") as file:
         file.write(ujson.dumps(player_data_base, indent=2))
 
@@ -27,7 +28,7 @@ def create_exist_player(identification_number: int) -> player.Player:
     account = get_account_dict(identification_number)
     return player.Player(account["name"], account["login"], account["identification_number"], account["location"],
                          account["damage"], account["health_points"], account["mana"], account["money"],
-                         account["experience"], account["enemies"])
+                         account["experience"], account["enemies"], account["inventory"])
 
 
 def except_not_exist_account(identification_number: int, name: str, login: str):
@@ -60,3 +61,8 @@ def do_event(identification_number: int, event: str) -> str:
     answer = events[event]["description"] + "\n"
     answer += check_event(identification_number, events, event)
     return answer
+
+
+def get_inventory_info(identification_number: int) -> str:
+    account = create_exist_player(identification_number)
+    return account.inventory_info()
